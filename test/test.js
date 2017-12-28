@@ -315,3 +315,13 @@ it('can be isolated', function(done) {
         .pipe(hbs(fs.src('*.hbs'), {compile: instance.compile.bind(instance)}))
         .pipe(expects.singleFile('file.html', 'bar 1', done));
 });
+
+it('should throw error when template is not valid', function(done) {
+    try {
+        hbs(0);
+    } catch (err) {
+        assert.strictEqual(err.plugin, 'gulp-hbs');
+        assert.strictEqual(err.message, 'Need a template!');
+    }
+    return done();
+});
