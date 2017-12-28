@@ -1,18 +1,18 @@
 'use strict';
 
 var through = require('through2');
-var gutil = require('gulp-util');
 var fs = require('fs');
 var Promise = require('bluebird').Promise;
 var Handlebars = require('handlebars');
-var PluginError = gutil.PluginError;
+var PluginError = require('plugin-error');
+var replaceExt = require('replace-ext');
 
 var globalCache = {};
 
 var PLUGIN_NAME = 'gulp-hbs';
 
 function pluginError(msg) {
-    return new gutil.PluginError(PLUGIN_NAME, msg);
+    return new PluginError(PLUGIN_NAME, msg);
 }
 
 var THE_ONLY_TEMPLATE = {};
@@ -184,7 +184,9 @@ function gulpHbs(templateSrc, options) {
                 || defaultTemplateName)
             .then(function(template) {
                 var result = template(data);
-                file.path = gutil.replaceExtension(file.path, '.html');
+                // this should be converted to vinyl-fs .extname API
+                // mockFS() creates File objects which does not have .extname property
+                file.path = replaceExt(file.path, '.html');
                 file.contents = new Buffer(result, 'utf-8');
                 return file;
             });
